@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.example.spring_boot.grpc";
+option java_outer_classname = "IdmProto";
+
+
+message AuthRequest {
+    string Username = 1;
+    string Password = 2;
+}
+
+message AuthResponse {
+    string TokenValue = 1;
+}
+
+message TokenRequest {
+    string TokenValue = 1;
+}
+
+message TokenValidationResponse {
+    bool Valid = 1;
+    bool Expired = 2;
+    string Subject = 3;
+    string Role = 4;
+    string Email = 5;
+    string Message = 6;
+}
+
+message DestroyTokenResponse {
+    bool Success = 1;
+    string Message = 2;
+}
+
+message UserRequest {
+    string Email = 1;
+    string Password = 2;
+    string Role = 3; // admin professor student
+    string TokenValue = 4;
+}
+
+message UserResponse {
+    int64 Id = 1;
+    string Email = 2;
+    string Role = 3;
+}
+
+message UserIdRequest {
+    int64 Id = 1;
+}
+
+message UserList {
+    repeated UserResponse Users = 1;
+}
+
+
+service IdmService {
+
+    rpc Authenticate (AuthRequest) returns (AuthResponse);
+
+    rpc ValidateToken (TokenRequest) returns (TokenValidationResponse);
+
+    rpc DestroyToken (TokenRequest) returns (DestroyTokenResponse);
+
+    rpc CreateUser (UserRequest) returns (UserResponse);
+    rpc GetUserById (UserIdRequest) returns (UserResponse);
+    rpc GetAllUsers (google.protobuf.Empty) returns (UserList);
+}

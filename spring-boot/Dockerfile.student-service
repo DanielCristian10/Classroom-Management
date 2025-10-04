@@ -1,0 +1,20 @@
+FROM openjdk:17-jdk-slim
+
+ENV SERVER_PORT=8082
+EXPOSE 8082
+
+ENV DB_HOST=mariadb
+ENV DB_PORT=3306
+ENV DB_NAME=posDB
+ENV DB_USER=user
+ENV DB_PASSWORD=parola123
+
+ENV MONGO_HOST=mongodb
+ENV MONGO_PORT=27017
+ENV MONGO_USER=root
+ENV MONGO_PASSWORD=root123
+ENV MONGO_AUTH_DB=admin
+
+COPY target/spring-boot-0.0.1-SNAPSHOT.jar /app.jar
+
+ENTRYPOINT ["java","-jar","/app.jar","--server.port=8082","--spring.datasource.url=jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}","--spring.datasource.username=${DB_USER}","--spring.datasource.password=${DB_PASSWORD}","--spring.data.mongodb.host=${MONGO_HOST}","--spring.data.mongodb.port=${MONGO_PORT}","--spring.data.mongodb.username=${MONGO_USER}","--spring.data.mongodb.password=${MONGO_PASSWORD}","--spring.data.mongodb.authentication-database=${MONGO_AUTH_DB}"]

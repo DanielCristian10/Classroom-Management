@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: posDB
+      MYSQL_USER: user
+      MYSQL_PASSWORD: parola123
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root123
+    ports:
+      - "27017:27017"
+    networks:
+      - app_network
+    volumes:
+      - mongodb_data:/data/db
+
+  lecture-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.lecture-service
+    container_name: lecture_service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - app_network
+
+  student-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.student-service
+    container_name: student_service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - app_network
+
+  professor-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.professor-service
+    container_name: professor_service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - app_network
+
+  grpc-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.grpc-service
+    container_name: grpc_service
+    ports:
+      - "9090:9090"
+      - "50051:50051"
+    depends_on:
+      - mariadb
+      - mongodb
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mariadb_data:
+  mongodb_data:
